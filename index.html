@@ -1,39 +1,46 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>To-Do List</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f4f6f9;
-                margin-top: 50px;
+                margin: 0;
+                padding-top: 40px;
+                display: flex;
+                justify-content: center;
             }
-
             .todo-card {
                 background-color: #ffffff;
-                width: 380px;
+                width: 90%;
+                max-width: 380px;
                 padding: 25px;
                 border-radius: 12px;
                 box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+                box-sizing: border-box;
             }
-
             h2 {
                 color: #333333;
                 margin-top: 0;
+                text-align: center;
             }
-
+            .input-group {
+                display: flex;
+                gap: 8px;
+            }
             input[type="text"] {
-                width: 70%;
+                flex: 1;
                 padding: 10px;
                 border: 1px solid #cccccc;
                 border-radius: 6px;
                 font-size: 14px;
                 outline: none;
             }
-
             input[type="text"]:focus {
                 border-color: #007bff;
             }
-
             .add-btn {
                 padding: 10px 15px;
                 background-color: #007bff;
@@ -42,30 +49,31 @@
                 border-radius: 6px;
                 cursor: pointer;
                 font-size: 14px;
+                font-weight: bold;
             }
-
             .add-btn:hover {
                 background-color: #0056b3;
             }
-
             table {
                 width: 100%;
                 margin-top: 20px;
                 border-collapse: collapse;
             }
-
             td {
                 padding: 10px;
                 border-bottom: 1px solid #eeeeee;
                 text-align: left;
+                word-break: break-word;
             }
-
-            td:first-child {
+            .task-text {
                 cursor: pointer;
                 font-size: 15px;
                 color: #333333;
             }
-
+            .completed {
+                text-decoration: line-through;
+                color: #888888 !important;
+            }
             .delete-btn {
                 background-color: #ff4d4d;
                 color: white;
@@ -75,78 +83,119 @@
                 cursor: pointer;
                 font-size: 12px;
             }
-
             .delete-btn:hover {
                 background-color: #cc0000;
             }
         </style>
     </head>
     <body>
-    <center>
         <div class="todo-card">
             <h2>My To-Do List</h2>
-
-            <input id="T" type="text" placeholder="Enter a new task...">
-            <button class="add-btn" onclick="AddTask()">Add</button>
-
+            <div class="input-group">
+                <input id="T" type="text" placeholder="Enter a new task...">
+                <button class="add-btn" onclick="AddTask()">Add</button>
+            </div>
             <table>
                 <tbody id="taskdata">
                 </tbody>
             </table>
         </div>
-    </center>
-    </body>
 
     <script>
         function AddTask() {
-            var T = document.getElementById("T").value;
-
-            if (T != "") {
+            var input = document.getElementById("T");
+            var taskValue = input.value.trim();
+            if (taskValue !== "") {
                 var table = document.getElementById("taskdata");
+                var row = document.createElement("tr");
 
-                table.innerHTML += "<tr><td onclick='CompleteTask(this)'>" + T + "</td><td style='text-align: right;'><button class='delete-btn' onclick='DeleteTask(this)'>Delete</button></td></tr>";
+                var taskCell = document.createElement("td");
+                taskCell.className = "task-text";
+                taskCell.textContent = taskValue;
+                taskCell.onclick = function() {
+                    this.classList.toggle("completed");
+                    SaveData();
+                };
 
-                document.getElementById("T").value = "";
+                var actionCell = document.createElement("td");
+                actionCell.style.textAlign = "right";
 
+                var delBtn = document.createElement("button");
+                delBtn.className = "delete-btn";
+                delBtn.textContent = "Delete";
+                delBtn.onclick = function() {
+                    row.remove();
+                    SaveData();
+                };
+
+                actionCell.appendChild(delBtn);
+                row.appendChild(taskCell);
+                row.appendChild(actionCell);
+                table.appendChild(row);
+
+                input.value = "";
                 SaveData();
-            }
-            else {
+            } else {
                 alert("Please Enter Task");
             }  
         }
 
-        function CompleteTask(task) {
-            if (task.style.textDecoration == "line-through") {
-                task.style.textDecoration = "none";
-                task.style.color = "#333333";
-            } else {
-                task.style.textDecoration = "line-through";
-                task.style.color = "#888888"; 
-
-            SaveData();
-        }
-
-        function DeleteTask(button) {
-            var row = button.parentElement.parentElement;
-            row.remove();
-
-            SaveData();
-        }
-
         function SaveData() {
             var table = document.getElementById("taskdata");
-            localStorage.setItem("myTasks", table.innerHTML);
+            var tasks = [];
+            var rows = table.getElementsByTagName("tr");
+            for (var i = 0; i < rows.length; i++) {
+                var textCell = rows[i].querySelector(".task-text");
+                if (textCell) {
+                    tasks.push({
+                        text: textCell.textContent,
+                        completed: textCell.classList.contains("completed")
+                    });
+                }
+            }
+            localStorage.setItem("myTodoListItems", JSON.stringify(tasks));
         }
 
         function ShowData() {
-            var table = document.getElementById("taskdata");
-            var saved = localStorage.getItem("myTasks");
-            if (saved != null) {
-                table.innerHTML = saved;
+            var saved = localStorage.getItem("myTodoListItems");
+            if (saved) {
+                var tasks = JSON.parse(saved);
+                var table = document.getElementById("taskdata");
+                table.innerHTML = "";
+                tasks.forEach(function(item) {
+                    var row = document.createElement("tr");
+
+                    var taskCell = document.createElement("td");
+                    taskCell.className = "task-text";
+                    if (item.completed) {
+                        taskCell.classList.add("completed");
+                    }
+                    taskCell.textContent = item.text;
+                    taskCell.onclick = function() {
+                        this.classList.toggle("completed");
+                        SaveData();
+                    };
+
+                    var actionCell = document.createElement("td");
+                    actionCell.style.textAlign = "right";
+
+                    var delBtn = document.createElement("button");
+                    delBtn.className = "delete-btn";
+                    delBtn.textContent = "Delete";
+                    delBtn.onclick = function() {
+                        row.remove();
+                        SaveData();
+                    };
+
+                    actionCell.appendChild(delBtn);
+                    row.appendChild(taskCell);
+                    row.appendChild(actionCell);
+                    table.appendChild(row);
+                });
             }
         }
-    }
 
         ShowData();
     </script>
+    </body>
 </html>
