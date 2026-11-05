@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>To-Do List</title>
@@ -7,7 +8,6 @@
                 background-color: #f4f6f9;
                 margin-top: 50px;
             }
-
             .todo-card {
                 background-color: #ffffff;
                 width: 380px;
@@ -15,12 +15,10 @@
                 border-radius: 12px;
                 box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
             }
-
             h2 {
                 color: #333333;
                 margin-top: 0;
             }
-
             input[type="text"] {
                 width: 70%;
                 padding: 10px;
@@ -29,11 +27,9 @@
                 font-size: 14px;
                 outline: none;
             }
-
             input[type="text"]:focus {
                 border-color: #007bff;
             }
-
             .add-btn {
                 padding: 10px 15px;
                 background-color: #007bff;
@@ -43,29 +39,24 @@
                 cursor: pointer;
                 font-size: 14px;
             }
-
             .add-btn:hover {
                 background-color: #0056b3;
             }
-
             table {
                 width: 100%;
                 margin-top: 20px;
                 border-collapse: collapse;
             }
-
             td {
                 padding: 10px;
                 border-bottom: 1px solid #eeeeee;
                 text-align: left;
             }
-
             td:first-child {
                 cursor: pointer;
                 font-size: 15px;
                 color: #333333;
             }
-
             .delete-btn {
                 background-color: #ff4d4d;
                 color: white;
@@ -75,7 +66,6 @@
                 cursor: pointer;
                 font-size: 12px;
             }
-
             .delete-btn:hover {
                 background-color: #cc0000;
             }
@@ -85,10 +75,8 @@
     <center>
         <div class="todo-card">
             <h2>My To-Do List</h2>
-
             <input id="T" type="text" placeholder="Enter a new task...">
             <button class="add-btn" onclick="AddTask()">Add</button>
-
             <table>
                 <tbody id="taskdata">
                 </tbody>
@@ -96,21 +84,15 @@
         </div>
     </center>
     </body>
-
     <script>
         function AddTask() {
             var T = document.getElementById("T").value;
-
             if (T != "") {
                 var table = document.getElementById("taskdata");
-
                 table.innerHTML += "<tr><td onclick='CompleteTask(this)'>" + T + "</td><td style='text-align: right;'><button class='delete-btn' onclick='DeleteTask(this)'>Delete</button></td></tr>";
-
                 document.getElementById("T").value = "";
-
                 SaveData();
-            }
-            else {
+            } else {
                 alert("Please Enter Task");
             }  
         }
@@ -121,15 +103,14 @@
                 task.style.color = "#333333";
             } else {
                 task.style.textDecoration = "line-through";
-                task.style.color = "#888888"; 
-
+                task.style.color = "#888888";
+            }
             SaveData();
         }
 
         function DeleteTask(button) {
             var row = button.parentElement.parentElement;
             row.remove();
-
             SaveData();
         }
 
@@ -145,7 +126,6 @@
                 table.innerHTML = saved;
             }
         }
-    }
 
         ShowData();
     </script>
